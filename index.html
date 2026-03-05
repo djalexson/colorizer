@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Подбор цвета забора — Топ Забор</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="assets/vendor/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="assets/vendor/bootstrap-icons/font/bootstrap-icons.min.css">
+    <link rel='stylesheet' href='assets/css/colorizer.css'>
+</head>
+<body>
+<div class="colorizer is-booting">
+    <div class="colorizer__cols">
+        <!-- Левая колонка -->
+        <div class="colorizer__left">
+            <div class="colorizer__block">
+                <div class="colorizer__block-title">Загрузите фото дома либо выберите из предложенных вариантов</div>
+                <div class="colorizer__upload">
+                    <div class="colorizer__dropzone" id="dropZone" tabindex="0" role="button" aria-label="Перетащите фото или выберите с компьютера">
+                        <i class="bi bi-cloud-arrow-up colorizer__drop-icon" aria-hidden="true"></i>
+                        <div class="colorizer__drop-title">Перетащите фото сюда</div>
+                        <div class="colorizer__drop-subtitle">или выберите с компьютера</div>
+                    </div>
+                    <div class="colorizer__upload-actions">
+                        <button type="button" class="colorizer__btn" id="pickBg">Выбрать с компьютера</button>
+                        <span class="colorizer__upload-name" id="uploadName">Файл не выбран</span>
+                    </div>
+                    <div class="colorizer__upload-preview" id="uploadPreviewWrap" hidden>
+                        <img class="colorizer__upload-thumb" id="uploadPreview" src="" alt="Миниатюра загруженного фото">
+                    </div>
+                    <input class="colorizer__file" type="file" id="uploadBg" accept="image/*" hidden>
+                    <button type="button" class="colorizer__btn colorizer__btn--ghost" id="clearBg">Сбросить фото</button>
+                </div>
+            </div>
+            <div class="colorizer__block">
+                <div class="colorizer__block-title">Выбрать из примеров:</div>
+                <div class="colorizer__examples"></div>
+            </div>
+            <div class="colorizer__block">
+                <div class="colorizer__benefits">
+                    <div class="benefit">
+                        <i class="benefit__icon bi bi-house-check-fill" aria-hidden="true"></i>
+                        <div>
+                            <div class="benefit__title">Реалистичная визуализация</div>
+                            <div class="benefit__text">Текстуры реальных блоков и металла — вы видите, как забор будет выглядеть вживую.</div>
+                        </div>
+                    </div>
+                    <div class="benefit">
+                        <i class="benefit__icon bi bi-arrow-repeat" aria-hidden="true"></i>
+                        <div>
+                            <div class="benefit__title">Мгновенная смена цветов</div>
+                            <div class="benefit__text">Меняйте цвет одним кликом — сервис сохраняет предыдущие варианты.</div>
+                        </div>
+                    </div>
+                    <div class="benefit">
+                        <i class="benefit__icon bi bi-clock-history" aria-hidden="true"></i>
+                        <div>
+                            <div class="benefit__title">Экономия времени</div>
+                            <div class="benefit__text">Вместо десятков выездов — всё видно онлайн.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Правая колонка -->
+        <div class="colorizer__right">
+            <div class="colorizer__preview">
+                <img class="colorizer__bg" id="previewBg" src="assets/colorizer/backgrounds/ch1.jpg" alt="фон">
+                <div class="colorizer__overlay colorizer__overlay--fill" id="overlayFill"></div>
+                <div class="colorizer__overlay colorizer__overlay--front" id="overlayFront"></div>
+                <div class="overlay-notice" id="overlayNotice" hidden></div>
+                <button type="button" class="colorizer__download-btn" id="downloadPreview" aria-label="Скачать изображение">
+                    <i class="bi bi-download" aria-hidden="true"></i>
+                    <span>Скачать</span>
+                </button>
+            </div>
+
+            <div class="colorizer__settings">
+                <div class="colorizer__block-title">Настройки забора</div>
+
+                <div class="fence-group" id="viewSection">
+                    <div class="fence-group__label">Вид</div>
+                    <div class="fence-group__options" id="viewGroup"></div>
+                </div>
+
+                <div class="fence-group" id="blockSection">
+                    <div class="fence-group__label">Текстуры</div>
+                    <div class="fence-group__options" id="blockGroup"></div>
+                </div>
+
+                <div class="fence-group" id="typeSection">
+									  <div class="fence-group__label">Наполнение</div>
+                    <div class="fence-group__options" id="typeGroup"></div>
+                </div>
+
+                <div class="fence-group" id="metalSection">
+                    <div class="fence-group__label">Цвет текстуры</div>
+                    <div class="fence-group__options" id="metalGroup"></div>
+                </div>
+
+                <div class="fence-group" id="fillMetalSection">
+                    <div class="fence-group__label">Цвет металла</div>
+                    <div class="fence-group__options" id="fillMetalGroup"></div>
+                </div>
+
+                <div id="settingsCta" style="margin-top:24px">
+                    <b class="consult_text_cta">Если остались вопросы, специалисты помогут с выбором</b>
+                    <ul class="colorizer_list">
+                        <li><button type="button" class="btn-color">Консультация</button></li>
+                        <li><a href="tel:+79119233211">+7 (911) 923-32-11</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="colorizer__form">
+                <div class="colorizer__block-title">Оставьте заявку</div>
+                <button type="button" class="footer-callback__btn">Заказать звонок</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="assets/js/colorizer.js"></script>
+</body>
+</html>

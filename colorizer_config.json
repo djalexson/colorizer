@@ -1,0 +1,452 @@
+﻿{
+"version":  3,
+"assets":  {
+"defaultBackground":  "assets/colorizer/backgrounds/ch1.jpg"
+},
+"behavior":  {
+"defaultState":  {
+"block":  "gorc_deluxe",
+"type":  "ranch_horizontal_1",
+"metal":  "amber",
+"view":  "regular",
+"fillMetal":  "darkgray"
+},
+"notices":  {
+"noImage":  "Нет изображения для этой комбинации."
+}
+},
+"labels":  {
+"sections":  {
+"textures":  "Цвет текстуры",
+"blocks":  "Текстуры",
+"types":  "Наполнение",
+"views":  "Вид",
+"metals":  "Цвет текстуры",
+"fillMetals":  "Цвет металла"
+},
+"withoutTexture":  "Без текстур",
+"views":  {
+"regular":  "Обычный",
+"long":  "Длинный",
+"long_v2":  "Длинный 2",
+"long_v3":  "Длинный 3"
+}
+},
+"swatches":  {
+"black":  "#2f3438",
+"gray":  "#8d9398",
+"darkgray":  "#5f666c",
+"lightgray":  "#c8ccd0",
+"offwhite":  "#ece8df",
+"white":  "#f4f5f6",
+"amber":  "#b88350",
+"tan":  "#a47d59",
+"beige":  "#bca487",
+"brown":  "#6f5744",
+"green":  "#6d786b",
+"blue":  "#5e748d",
+"red":  "#8f5656"
+},
+"dynamic":  {
+"withoutTextureId":  "without_texture",
+"fills":  {
+"withTexture":  {
+"ranch_horizontal_1":  {
+"label":  "Ранчо 40×20",
+"regular":  "assets/colorizer/textures/metal/z/ranch_horizontal_1.webp",
+"long":  "assets/colorizer/textures/metal/z/ranch_horizontal_1_long.webp"
+},
+"ranch_horizontal_2":  {
+"label":  "Ранчо 80×20",
+"regular":  "assets/colorizer/textures/metal/z/ranch_horizontal_2.webp",
+"long":  "assets/colorizer/textures/metal/z/ranch_horizontal_2_long.webp",
+"metalColors":  [
+{
+"id":  "darkgray",
+"label":  "Темно-серый",
+"color":  "#5f666c",
+"swatch":  "#5f666c"
+},
+{
+"id":  "ranch80_texture",
+"label":  "Ранчо 80 текстура",
+"color":  "#8d9398",
+
+"regular":  "assets/colorizer/textures/metal/z/block-cappuccino-rancho-gray.png",
+"long":  "assets/colorizer/textures/metal/z/block-cappuccino-rancho-gray.png",
+"swatch":  "#8d9398"
+}]
+},
+"ranch_horizontal_3":  {
+"label":  "Ранчо 120×20",
+"regular":  "assets/colorizer/textures/metal/z/ranch_horizontal_3.webp",
+"long":  "assets/colorizer/textures/metal/z/ranch_horizontal_3_long.webp"
+}
+},
+"withoutTexture":  {
+"comb_vertical":  {
+"label":  "Вертикальный гребень",
+"regular":  "assets/colorizer/textures/metal/texturs/comb_vertical.webp",
+"long":  "assets/colorizer/textures/metal/texturs/comb_vertical_long.webp"
+},
+"diamond_pattern":  {
+"label":  "Ромб",
+"regular":  "assets/colorizer/textures/metal/texturs/diamond_pattern.webp",
+"long":  "assets/colorizer/textures/metal/texturs/diamond_pattern_long.webp"
+},
+"ranch_mix":  {
+"label":  "Ранч микс",
+"regular":  "assets/colorizer/textures/metal/texturs/ranch_mix.webp",
+"long":  "assets/colorizer/textures/metal/texturs/ranch_mix_long.webp",
+"long_v2":  "assets/colorizer/textures/metal/texturs/ranch_mix_long_v2.webp",
+"long_v3":  "assets/colorizer/textures/metal/texturs/ranch_mix_long_v3.webp"
+},
+"solid_panel":  {
+"label":  "Сплошная панель",
+"regular":  "assets/colorizer/textures/metal/texturs/solid_panel.webp",
+"long":  "assets/colorizer/textures/metal/texturs/solid_panel_long.webp"
+},
+"vertical_light":  {
+"label":  "Вертикаль лайт",
+"regular":  "assets/colorizer/textures/metal/texturs/vertical_light.webp",
+"long":  "assets/colorizer/textures/metal/texturs/vertical_light_long.webp"
+},
+"vertical_slats_1":  {
+"label":  "Вертикальные рейки 1",
+"regular":  "assets/colorizer/textures/metal/texturs/vertical_slats_1.webp",
+"long":  "assets/colorizer/textures/metal/texturs/vertical_slats_1_long.webp"
+},
+"vertical_slats_2":  {
+"label":  "Вертикальные рейки 2",
+"regular":  "assets/colorizer/textures/metal/texturs/vertical_slats_2.webp",
+"long":  "assets/colorizer/textures/metal/texturs/vertical_slats_2_long.webp"
+}
+}
+},
+"textures":  [
+{
+"id":  "gorc_deluxe",
+"label":  "Горц Делюкс",
+"colors":  [
+{
+"id":  "amber",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/amber/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/amber/very-rough_long.webp",
+"label":  "Янтарный"
+},
+{
+"id":  "amber1",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/amber1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/amber1/very-rough_long.webp",
+"label":  "Янтарный 1"
+},
+{
+"id":  "darkgray",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/darkgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/darkgray/rough-speckled_long.webp",
+"label":  "Темно-серый"
+},
+{
+"id":  "darkgray1",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/darkgray1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/darkgray1/rough-speckled_long.webp",
+"label":  "Темно-серый 1"
+},
+{
+"id":  "gray",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/gray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/gray/very-rough_long.webp",
+"label":  "Серый"
+},
+{
+"id":  "gray1",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/gray1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/gray1/very-rough_long.webp",
+"label":  "Серый 1"
+},
+{
+"id":  "gray2",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/gray2/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/gray2/very-rough_long.webp",
+"label":  "Серый 2"
+},
+{
+"id":  "lightgray",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/lightgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/lightgray/very-rough_long.webp",
+"label":  "Светло-серый"
+},
+{
+"id":  "tan",
+"regular":  "assets/colorizer/textures/textur/gorc_deluxe/tan/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_deluxe/tan/very-rough_long.webp",
+"label":  "Песочный"
+}
+]
+},
+{
+"id":  "gorc_peak",
+"label":  "Горц Пик",
+"colors":  [
+{
+"id":  "darkgray",
+"regular":  "assets/colorizer/textures/textur/gorc_peak/darkgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_peak/darkgray/rough-speckled_long.webp",
+"label":  "Темно-серый"
+},
+{
+"id":  "darkgray1",
+"regular":  "assets/colorizer/textures/textur/gorc_peak/darkgray1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_peak/darkgray1/rough-speckled_long.webp",
+"label":  "Темно-серый 1"
+},
+{
+"id":  "gray",
+"regular":  "assets/colorizer/textures/textur/gorc_peak/gray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/gorc_peak/gray/very-rough_long.webp",
+"label":  "Серый"
+},
+{
+"id":  "gray1",
+"regular":  "assets/colorizer/textures/textur/gorc_peak/gray1/veined.webp",
+"long":  "assets/colorizer/textures/textur/gorc_peak/gray1/very-rough_long.webp",
+"label":  "Серый 1"
+}
+]
+},
+{
+"id":  "roma_classic",
+"label":  "Рома Классик",
+"colors":  [
+{
+"id":  "amber",
+"regular":  "assets/colorizer/textures/textur/roma_classic/amber/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_classic/amber/very-rough_long.webp",
+"label":  "Янтарный"
+},
+{
+"id":  "darkgray",
+"regular":  "assets/colorizer/textures/textur/roma_classic/darkgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_classic/darkgray/rough-speckled_long.webp",
+"label":  "Темно-серый"
+},
+{
+"id":  "gray",
+"regular":  "assets/colorizer/textures/textur/roma_classic/gray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_classic/gray/very-rough_long.webp",
+"label":  "Серый"
+},
+{
+"id":  "offwhite",
+"regular":  "assets/colorizer/textures/textur/roma_classic/offwhite/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_classic/offwhite/very-rough_long.webp",
+"label":  "Молочный"
+}
+]
+},
+{
+"id":  "roma_diamond",
+"label":  "Рома Даймонд",
+"colors":  [
+{
+"id":  "lightgray",
+"regular":  "assets/colorizer/textures/textur/roma_diamond/lightgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_diamond/lightgray/very-rough_long.webp",
+"label":  "Светло-серый"
+}
+]
+},
+{
+"id":  "roma_horizon",
+"label":  "Рома Горизонт",
+"colors":  [
+{
+"id":  "amber",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/amber/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/amber/veined_long.webp",
+"label":  "Янтарный"
+},
+{
+"id":  "amber1",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/amber1/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/amber1/veined_long.webp",
+"label":  "Янтарный 1"
+},
+{
+"id":  "darkgray",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/darkgray/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/darkgray/rough-speckled_long.webp",
+"label":  "Темно-серый"
+},
+{
+"id":  "darkgray1",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/darkgray1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/darkgray1/rough-speckled_long.webp",
+"label":  "Темно-серый 1"
+},
+{
+"id":  "gray",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/gray/veined.webp",
+"label":  "Серый"
+},
+{
+"id":  "lightgray",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/lightgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/lightgray/very-rough_long.webp",
+"label":  "Светло-серый"
+},
+{
+"id":  "tan",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/tan/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/tan/rough-speckled_long.webp",
+"label":  "Песочный"
+},
+{
+"id":  "white",
+"regular":  "assets/colorizer/textures/textur/roma_horizon/white/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_horizon/white/very-rough_long.webp",
+"label":  "Белый"
+}
+]
+},
+{
+"id":  "roma_mega",
+"label":  "Рома Мега",
+"colors":  [
+{
+"id":  "darkgray",
+"regular":  "assets/colorizer/textures/textur/roma_mega/darkgray/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_mega/darkgray/very-rough_long.webp",
+"label":  "Темно-серый"
+},
+{
+"id":  "darkgray1",
+"regular":  "assets/colorizer/textures/textur/roma_mega/darkgray1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_mega/darkgray1/rough-speckled_long.webp",
+"label":  "Темно-серый 1"
+},
+{
+"id":  "darkgray2",
+"regular":  "assets/colorizer/textures/textur/roma_mega/darkgray2/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_mega/darkgray2/rough-speckled_long.webp",
+"label":  "Темно-серый 2"
+},
+{
+"id":  "gray",
+"regular":  "assets/colorizer/textures/textur/roma_mega/gray/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_mega/gray/veined_long.webp",
+"label":  "Серый"
+},
+{
+"id":  "offwhite",
+"regular":  "assets/colorizer/textures/textur/roma_mega/offwhite/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_mega/offwhite/very-rough_long.webp",
+"label":  "Молочный"
+},
+{
+"id":  "tan",
+"regular":  "assets/colorizer/textures/textur/roma_mega/tan/veined.webp",
+"long":  "assets/colorizer/textures/textur/roma_mega/tan/rough-speckled_long.webp",
+"label":  "Песочный"
+}
+]
+},
+{
+"id":  "roma_nova",
+"label":  "Рома Нова",
+"colors":  [
+{
+"id":  "darkgray",
+"regular":  "assets/colorizer/textures/textur/roma_nova/darkgray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_nova/darkgray/very-rough_long.webp",
+"label":  "Темно-серый"
+},
+{
+"id":  "lightgray",
+"long":  "assets/colorizer/textures/textur/roma_nova/lightgray/veined_long.webp",
+"label":  "Светло-серый"
+}
+]
+},
+{
+"id":  "roma_perfect",
+"label":  "Рома Перфект",
+"colors":  [
+{
+"id":  "gray",
+"regular":  "assets/colorizer/textures/textur/roma_perfect/gray/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_perfect/gray/very-rough_long.webp",
+"label":  "Серый"
+},
+{
+"id":  "gray1",
+"regular":  "assets/colorizer/textures/textur/roma_perfect/gray1/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_perfect/gray1/rough-speckled_long.webp",
+"label":  "Серый 1"
+},
+{
+"id":  "lightgray",
+"regular":  "assets/colorizer/textures/textur/roma_perfect/lightgray/veined.webp",
+"label":  "Светло-серый"
+},
+{
+"id":  "lightgray1",
+"long":  "assets/colorizer/textures/textur/roma_perfect/lightgray1/very-rough_long.webp",
+"label":  "Светло-серый 1"
+},
+{
+"id":  "lightgray2",
+"regular":  "assets/colorizer/textures/textur/roma_perfect/lightgray2/very-rough.webp",
+"long":  "assets/colorizer/textures/textur/roma_perfect/lightgray2/very-rough_long.webp",
+"label":  "Светло-серый 2"
+}
+]
+}
+],
+"defaultFillMetalColors":  [
+"black",
+"darkgray",
+"gray",
+"lightgray",
+"white",
+"amber",
+"brown"
+]
+},
+"examples":  [
+{
+"title":  "Дом 1",
+"bg":  "assets/colorizer/backgrounds/ch1.jpg",
+"thumb":  "assets/colorizer/backgrounds/ch1.jpg"
+},
+{
+"title":  "Дом 2",
+"bg":  "assets/colorizer/backgrounds/ch2.webp",
+"thumb":  "assets/colorizer/backgrounds/ch2.webp"
+},
+{
+"title":  "Дом 3",
+"bg":  "assets/colorizer/backgrounds/ch3-1024x682.jpg",
+"thumb":  "assets/colorizer/backgrounds/ch3-1024x682.jpg"
+},
+{
+"title":  "Дом 4",
+"bg":  "assets/colorizer/backgrounds/ch4-1024x768.webp",
+"thumb":  "assets/colorizer/backgrounds/ch4-1024x768.webp"
+}
+],
+"ui":  {
+"sectionOrder":  [
+"views",
+"blocks",
+"textureColors",
+"types",
+"metalColors"
+],
+"downloadButton":  {
+"enabled":  true,
+"label":  "Скачать",
+"ariaLabel":  "Скачать изображение"
+}
+}
+}
