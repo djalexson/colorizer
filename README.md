@@ -1,45 +1,138 @@
-# Колорайзер забора
+# Colorizer Fence Configurator
 
-Короче, это мини-конструктор забора: тыкаешь текстуры, наполнение, цвета, вид, и сразу смотришь, как это выглядит на фотке дома.
+Небольшой конфигурируемый визуализатор забора. Основная логика живет в `assets/js/colorizer.js`, а почти все настройки и контент задаются через `colorizer_config.json`.
 
-## Что тут есть
+## Что умеет
 
-- Загрузка своего фото + пресеты фонов
-- Выбор:
-  - `Вид`
-  - `Текстуры`
-  - `Наполнение`
-  - `Цвет текстуры`
-  - `Цвет металла`
-- Кнопка скачивания результата прямо с превью (PNG)
-- Почти всё рулится через `colorizer_config.json`
+- Показывает забор поверх фонового изображения дома
+- Переключает `Текстуры`, `Наполнение`, `Цвет текстуры`, `Цвет металла`, `Вид`
+- Поддерживает пресеты фонов и загрузку своего фото
+- Умеет работать и через `http/https`, и напрямую через `file://`
+- Позволяет скрывать секции и отдельные кнопки прямо из конфига
 
-## Быстрый старт
+## Файлы
 
-Никакой магии:
-
-1. Открываешь `index.html` в браузере
-2. Меняешь `colorizer_config.json`
-3. Жмёшь `Ctrl+F5`, чтобы не словить кэш-обман
-
-## Структура проекта
-
-- `index.html` — разметка
+- `index.html` — страница
 - `assets/css/colorizer.css` — стили
-- `assets/js/colorizer.js` — вся логика
-- `colorizer_config.json` — главный пульт управления
+- `assets/js/colorizer.js` — логика конструктора
+- `colorizer_config.json` — основной конфиг
+- `colorizer_config.js` — встроенный fallback-конфиг для запуска через `file://`
 
-## Конфиг, который реально важен
+## Запуск
 
-### 1) Порядок блоков в настройках
+### Через сервер
+
+Предпочтительный режим. Достаточно открыть проект через любой локальный сервер.
+
+### Напрямую через `file://`
+
+Тоже работает, но есть нюанс: браузер не даст читать `colorizer_config.json` через `fetch`, поэтому используется `colorizer_config.js`.
+
+Если менялся `colorizer_config.json`, для `file://` нужно пересобрать `colorizer_config.js`.
+
+PowerShell:
+
+```powershell
+$json = Get-Content colorizer_config.json -Raw
+$bytes = [System.Text.Encoding]::UTF8.GetBytes($json)
+$encoded = [Convert]::ToBase64String($bytes)
+$content = "// Local fallback for file:// launches. Generated from colorizer_config.json.`r`n(function () {`r`n    const encoded = '$encoded';`r`n    const bytes = Uint8Array.from(atob(encoded), function (char) { return char.charCodeAt(0); });`r`n    let jsonText = new TextDecoder('utf-8').decode(bytes);`r`n    if (jsonText.charCodeAt(0) === 0xFEFF) jsonText = jsonText.slice(1);`r`n    window.COLORIZER_CONFIG = JSON.parse(jsonText);`r`n})();`r`n"
+Set-Content colorizer_config.js -Value $content -Encoding UTF8
+```
+
+После правок делай `Ctrl+F5`.
+
+## Главные разделы конфига
+
+### `assets`
+
+Базовые ресурсы.
 
 ```json
-"ui": {
-  "sectionOrder": ["views", "blocks", "textureColors", "types", "metalColors"]
+"assets": {
+  "defaultBackground": "assets/colorizer/backgrounds/new/modern-flat-roof-house-1.webp"
 }
 ```
 
-Доступные ключи:
+### `behavior`
+
+Поведение по умолчанию.
+
+```json
+"behavior": {
+  "defaultState": {
+    "block": "gorc_deluxe_1",
+    "type": "ranch_horizontal_1",
+    "metal": "amber",
+    "view": "long",
+    "fillMetal": "gray"
+  },
+  "allowedViews": ["regular", "long", "long_v2", "long_v3"],
+  "swatchFallbackColor": "#8d9398",
+  "notices": {
+    "noImage": "Нет изображения для этой комбинации.",
+    "configLoadFailed": "Не удалось загрузить настройки конструктора."
+  }
+}
+```
+
+Примечания:
+
+- `defaultState.fillMetal` задает цвет металла по умолчанию
+- `allowedViews` ограничивает список кнопок вида
+- если вид не входит в `allowedViews`, кнопка не появится даже при наличии подписи
+
+### `labels`
+
+Подписи интерфейса.
+
+```json
+"labels": {
+  "sections": {
+    "views": "",
+    "blocks": "Текстуры",
+    "types": "Наполнение",
+    "metals": "Цвет текстуры",
+    "fillMetals": "Цвет металла"
+  },
+  "views": {
+    "regular": "",
+    "long": "Длинный",
+    "long_v2": "Длинный 2",
+    "long_v3": "Длинный 3"
+  }
+}
+```
+
+Правила:
+
+- пустая строка в `labels.sections.*` скрывает заголовок секции
+- пустая строка в `labels.views.*` скрывает кнопку конкретного вида
+
+### `ui`
+
+Настройки порядка секций, подписей загрузки и разметки.
+
+```json
+"ui": {
+  "sectionOrder": ["views", "blocks", "types", "metalColors"],
+  "upload": {
+    "emptyLabel": "Файл не выбран",
+    "loadedLabel": "Загруженное фото"
+  },
+  "downloadButton": {
+    "enabled": true,
+    "label": "Скачать",
+    "ariaLabel": "Скачать изображение"
+  },
+  "layout": {
+    "preview": [...],
+    "sections": [...]
+  }
+}
+```
+
+Ключи для `sectionOrder`:
 
 - `views`
 - `blocks`
@@ -47,81 +140,71 @@
 - `textureColors`
 - `metalColors`
 
-Если ключ не указал, блок будет скрыт.
+`ui.layout.preview` описывает DOM превью, а `ui.layout.sections` — список секций настроек. Разметка собирается в рантайме из JSON.
 
-### 2) Кнопка скачивания (вкл/выкл + название)
+## Контент конструктора
 
-```json
-"ui": {
-  "downloadButton": {
-    "enabled": true,
-    "label": "Скачать",
-    "ariaLabel": "Скачать изображение"
-  }
-}
-```
+### `dynamic.textures`
 
-### 3) Текстуры блока (`dynamic.textures`)
+Список текстур. Каждая текстура — это объект с `id`, `label` и массивом `colors`.
 
-Теперь это **массив**, а не древний объект:
+Чтобы убрать текстуру из интерфейса, достаточно удалить ее объект из массива `dynamic.textures`.
 
-```json
-"textures": [
-  {
-    "id": "gorc_deluxe",
-    "label": "Горц Делюкс",
-    "colors": [
-      {
-        "id": "amber",
-        "label": "Янтарный",
-        "regular": "assets/.../very-rough.webp",
-        "long": "assets/.../very-rough_long.webp"
-      }
-    ]
-  }
-]
-```
+### `dynamic.fills`
 
-### 4) Цвет металла для наполнения (`metalColors`) самый сок
+Наполнение для режимов:
 
-`metalColors` можно задавать у каждого типа наполнения, например в:
+- `withTexture`
+- `withoutTexture`
 
-- `dynamic.fills.withTexture.ranch_horizontal_2.metalColors`
+Внутри каждого наполнения можно задавать:
 
-Поддерживается:
+- `regular`
+- `long`
+- `long_v2`
+- `long_v3`
+- `metalColors`
 
-- `color` / `swatch` — обычный цвет
-- `texture` — **наложение** (паттерн поверх)
-- `regular` / `long` / `long_v2` / `long_v3` — **замена основной картинки слоя** по виду
+### `metalColors`
+
+Настройки кнопок и визуала для `Цвет металла`.
+
+Поддерживаемые поля:
+
+- `id`
+- `label`
+- `color`
+- `swatch`
+- `texture`
+- `regular`
+- `long`
+- `long_v2`
+- `long_v3`
+
+Смысл полей:
+
+- `swatch` — цвет кружка на кнопке
+- `color` — цвет для tint-наложения
+- `texture` — текстура-наложение поверх слоя
+- `regular/long/...` — подмена самого изображения слоя по виду
 
 Пример:
 
 ```json
 {
-  "id": "ranch80_texture",
-  "label": "Ранчо 80 текстура",
-  "color": "#8d9398",
-  "texture": "assets/colorizer/textures/metal/z/block-cappuccino-rancho-gray.png",
-  "regular": "assets/colorizer/textures/metal/z/block-cappuccino-rancho-gray.png",
-  "long": "assets/colorizer/textures/metal/z/block-cappuccino-rancho-gray.png",
-  "swatch": "#8d9398"
+  "id": "gray",
+  "label": "Серый",
+  "color": "#FFFFFF",
+  "swatch": "#8D9398",
+  "regular": "assets/colorizer/textures/metal/z/ranch_horizontal_2.webp",
+  "long": "assets/colorizer/textures/metal/z/ranch_horizontal_2_long.webp"
 }
 ```
 
-Кратко:
+Если нужен просто серый кружок без текстурной миниатюры на кнопке, достаточно оставить `swatch`.
 
-- `regular/long` -> чем **заменяем** базовую картинку
-- `texture` -> что **накладываем** сверху
+## Полезно помнить
 
-### 5) Скрытие блоков, если данных нет
-
-Логика уже встроена:
-
-- если у текстуры нет цветов -> `Цвет текстуры` прячется
-- если нет `metalColors` (и нет `defaultFillMetalColors`) -> `Цвет металла` прячется
-
-## Полезный совет
-
-Если "вроде поменял, а на экране старое" это почти всегда кэш.  
-Просто `Ctrl+F5`, и жизнь снова норм.
-
+- После изменения `colorizer_config.json` обновляй страницу через `Ctrl+F5`
+- Для `file://` не забывай пересобирать `colorizer_config.js`
+- Если у секции нет данных, она скрывается автоматически
