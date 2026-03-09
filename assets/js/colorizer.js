@@ -1289,6 +1289,11 @@
     function fillMetalSwatch(fillMetal) {
         const metals = getCurrentFillMetals();
         const node = metals[fillMetal];
+        const swatch = toText(node && node.swatch, guessedColorByKey(fillMetal));
+        if (isHexColor(swatch)) {
+            return swatch;
+        }
+
         const variants = isObject(node && node.imageVariants) ? node.imageVariants : {};
         const previewTexture = resolveVariantPath(variants, 'regular') || toText(node && node.texture, '');
         if (previewTexture) {
@@ -1300,8 +1305,7 @@
             };
         }
 
-        const swatch = toText(node && node.swatch, guessedColorByKey(fillMetal));
-        return swatch;
+        return guessedColorByKey(fillMetal);
     }
 
     function blockSwatch(block) {

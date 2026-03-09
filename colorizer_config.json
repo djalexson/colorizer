@@ -9,7 +9,7 @@
 "type": "ranch_horizontal_1",
 "metal": "amber",
 "view": "long",
-"fillMetal": "black"
+"fillMetal": "gray"
 },
 "allowedViews": [
 "regular",
@@ -65,32 +65,12 @@
 "long": "assets/colorizer/textures/metal/z/ranch_horizontal_1_long.webp",
 "metalColors": [
 {
-"id": "black",
-"label": "Черный",
-"color": "#111111",
-"swatch": "#111111",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_black.png"
-},
-{
 "id": "gray",
 "label": "Серый",
-"color": "#9CA3AA",
-"swatch": "#9CA3AA",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_gray.png"
-},
-{
-"id": "brown",
-"label": "Коричневый",
-"color": "#7A4A2B",
-"swatch": "#7A4A2B",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_brown.png"
-},
-{
-"id": "red",
-"label": "Красный",
-"color": "#C52634",
-"swatch": "#C52634",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_red.png"
+"color": "#FFFFFF",
+"swatch": "#8D9398",
+"regular": "assets/colorizer/textures/metal/z/ranch_horizontal_1.webp",
+"long": "assets/colorizer/textures/metal/z/ranch_horizontal_1_long.webp"
 }
 ]
 },
@@ -100,32 +80,12 @@
 "long": "assets/colorizer/textures/metal/z/ranch_horizontal_2_long.webp",
 "metalColors": [
 {
-"id": "black",
-"label": "Черный",
-"color": "#111111",
-"swatch": "#111111",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_black.png"
-},
-{
 "id": "gray",
 "label": "Серый",
-"color": "#9CA3AA",
-"swatch": "#9CA3AA",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_gray.png"
-},
-{
-"id": "brown",
-"label": "Коричневый",
-"color": "#7A4A2B",
-"swatch": "#7A4A2B",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_brown.png"
-},
-{
-"id": "red",
-"label": "Красный",
-"color": "#C52634",
-"swatch": "#C52634",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_red.png"
+"color": "#FFFFFF",
+"swatch": "#8D9398",
+"regular": "assets/colorizer/textures/metal/z/ranch_horizontal_2.webp",
+"long": "assets/colorizer/textures/metal/z/ranch_horizontal_2_long.webp"
 }
 ]
 },
@@ -135,32 +95,12 @@
 "long": "assets/colorizer/textures/metal/z/ranch_horizontal_3_long.webp",
 "metalColors": [
 {
-"id": "black",
-"label": "Черный",
-"color": "#111111",
-"swatch": "#111111",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_black.png"
-},
-{
 "id": "gray",
 "label": "Серый",
-"color": "#9CA3AA",
-"swatch": "#9CA3AA",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_gray.png"
-},
-{
-"id": "brown",
-"label": "Коричневый",
-"color": "#7A4A2B",
-"swatch": "#7A4A2B",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_brown.png"
-},
-{
-"id": "red",
-"label": "Красный",
-"color": "#C52634",
-"swatch": "#C52634",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_red.png"
+"color": "#FFFFFF",
+"swatch": "#8D9398",
+"regular": "assets/colorizer/textures/metal/z/ranch_horizontal_3.webp",
+"long": "assets/colorizer/textures/metal/z/ranch_horizontal_3_long.webp"
 }
 ]
 }
@@ -184,32 +124,14 @@
 "long_v3": "assets/colorizer/textures/metal/texturs/ranch_mix_long_v3.webp",
 "metalColors": [
 {
-"id": "black",
-"label": "Черный",
-"color": "#111111",
-"swatch": "#111111",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_black.png"
-},
-{
 "id": "gray",
 "label": "Серый",
-"color": "#9CA3AA",
-"swatch": "#9CA3AA",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_gray.png"
-},
-{
-"id": "brown",
-"label": "Коричневый",
-"color": "#7A4A2B",
-"swatch": "#7A4A2B",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_brown.png"
-},
-{
-"id": "red",
-"label": "Красный",
-"color": "#C52634",
-"swatch": "#C52634",
-"texture": "assets/colorizer/textures/metal/z/ranch_overlays/ranch_overlay_red.png"
+"color": "#FFFFFF",
+"swatch": "#8D9398",
+"regular": "assets/colorizer/textures/metal/texturs/ranch_mix.webp",
+"long": "assets/colorizer/textures/metal/texturs/ranch_mix_long.webp",
+"long_v2": "assets/colorizer/textures/metal/texturs/ranch_mix_long_v2.webp",
+"long_v3": "assets/colorizer/textures/metal/texturs/ranch_mix_long_v3.webp"
 }
 ]
 },
