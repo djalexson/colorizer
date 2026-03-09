@@ -281,29 +281,38 @@
             height: var(--fence-height);
             pointer-events: none;
         }
-        .colorizer__overlay img {
+        .colorizer__overlay img,
+        .colorizer__overlay canvas,
+        .colorizer__overlay .colorizer__masked-layer {
             width: 100%;
             height: 100%;
             display: block;
         }
+        .colorizer__overlay .colorizer__masked-layer {
+            background-color: transparent;
+        }
         .colorizer__overlay--fill {
             z-index: 2;
         }
-        .colorizer__overlay--fill img {
+        .colorizer__overlay--fill img,
+        .colorizer__overlay--fill canvas {
             object-fit: cover;
             object-position: center bottom;
         }
         .colorizer__overlay--fill.is-full {
             bottom: 0;
             }
-        .colorizer__overlay--fill.is-full img {
+        .colorizer__overlay--fill.is-full img,
+        .colorizer__overlay--fill.is-full canvas {
             object-fit: cover;
             object-position: center bottom;
         }
         .colorizer__overlay--front {
             z-index: 3;
         }
-        .colorizer__overlay--front img {
+        .colorizer__overlay--front canvas,
+        .colorizer__overlay--front img,
+        .colorizer__overlay--front .colorizer__masked-layer {
             object-fit: cover;
             object-position: center bottom;
         }
@@ -314,7 +323,9 @@
         .colorizer__preview.cz-no-texture {
             --fence-height: 72%;
         }
-        .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front img {
+        .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front canvas,
+        .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front img,
+        .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front .colorizer__masked-layer {
             width: 75%;
             height: 67%;
             display: block;
@@ -481,7 +492,9 @@
             .colorizer__preview.cz-no-texture {
                 --fence-height: 66%;
             }
-            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front img {
+            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front canvas,
+            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front img,
+            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front .colorizer__masked-layer {
                 width: 84%;
                 height: 72%;
                 transform: translate(0, 0);
@@ -498,7 +511,9 @@
             }
         }
         @media (max-width: 640px) {
-            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front img {
+            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front canvas,
+            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front img,
+            .colorizer__preview.cz-view-regular.cz-with-texture .colorizer__overlay--front .colorizer__masked-layer {
                 width: 92%;
                 height: 76%;
                 transform: translate(0, 0);
@@ -531,7 +546,9 @@
                 padding: 11px;
             }
         }
-        .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front img {
+        .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front canvas,
+        .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front img,
+        .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front .colorizer__masked-layer {
             width: var(--nt-front-width, 100%);
             height: var(--nt-front-height, 100%);
             object-fit: cover;
@@ -584,14 +601,18 @@
         }
 
         @media (max-width: 1024px) {
-            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front img {
+            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front canvas,
+            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front img,
+            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front .colorizer__masked-layer {
                 width: min(var(--nt-front-width, 100%), 106%);
                 height: min(var(--nt-front-height, 100%), 92%);
                 transform: translate(calc(var(--nt-front-x, 0px) * 0.56), calc(var(--nt-front-y, 0px) * 0.56));
             }
         }
         @media (max-width: 640px) {
-            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front img {
+            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front canvas,
+            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front img,
+            .colorizer__preview.cz-view-regular.cz-no-texture .colorizer__overlay--front .colorizer__masked-layer {
                 width: min(var(--nt-front-width, 100%), 103%);
                 height: min(var(--nt-front-height, 100%), 88%);
                 transform: translate(calc(var(--nt-front-x, 0px) * 0.34), calc(var(--nt-front-y, 0px) * 0.34));

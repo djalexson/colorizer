@@ -1,5 +1,6 @@
 ﻿(function() {
     const CONFIG_URL = 'colorizer_config.json';
+    const CONFIG_FALLBACK_KEY = 'COLORIZER_CONFIG';
     const STORAGE_KEY = 'colorizer_state_v2';
 
     let defaultBackground = '';
@@ -86,6 +87,15 @@
 
     function isObject(value) {
         return !!value && typeof value === 'object' && !Array.isArray(value);
+    }
+
+    function clonePlainData(value) {
+        if (typeof value === 'undefined') return null;
+        return JSON.parse(JSON.stringify(value));
+    }
+
+    function isFileProtocol() {
+        return window.location.protocol === 'file:';
     }
 
     function setBootState(isBooting) {
@@ -639,6 +649,26 @@
         drawImageWithObjectFit(ctx, imageEl, destRect, computed.objectFit || 'fill', position);
     }
 
+    function drawCanvasElementToCanvas(ctx, canvasEl, previewRect, scale) {
+        if (!canvasEl || !canvasEl.getBoundingClientRect) return;
+        if (!canvasEl.width || !canvasEl.height) return;
+
+        const rect = canvasEl.getBoundingClientRect();
+        if (!rect.width || !rect.height) return;
+
+        ctx.drawImage(
+            canvasEl,
+            0,
+            0,
+            canvasEl.width,
+            canvasEl.height,
+            (rect.left - previewRect.left) * scale,
+            (rect.top - previewRect.top) * scale,
+            rect.width * scale,
+            rect.height * scale
+        );
+    }
+
     function waitForImageReady(imageEl) {
         if (!imageEl) return Promise.resolve();
         const src = String(imageEl.currentSrc || imageEl.src || '').trim();
@@ -675,6 +705,8 @@
 
         const fillImg = overlayFill ? overlayFill.querySelector('img') : null;
         const frontImg = overlayFront ? overlayFront.querySelector('img') : null;
+        const fillCanvas = overlayFill ? overlayFill.querySelector('canvas') : null;
+        const frontCanvas = overlayFront ? overlayFront.querySelector('canvas') : null;
         await Promise.all([
             waitForImageReady(bgImg),
             waitForImageReady(fillImg),
@@ -691,6 +723,8 @@
         drawImageElementToCanvas(ctx, bgImg, previewRect, scale);
         drawImageElementToCanvas(ctx, fillImg, previewRect, scale);
         drawImageElementToCanvas(ctx, frontImg, previewRect, scale);
+        drawCanvasElementToCanvas(ctx, fillCanvas, previewRect, scale);
+        drawCanvasElementToCanvas(ctx, frontCanvas, previewRect, scale);
 
         const link = document.createElement('a');
         link.href = canvas.toDataURL('image/png');
@@ -1198,6 +1232,84 @@
         });
     }
 
+    function hasFillMetalStyle(fillMetalStyle) {
+        return !!(
+            isHexColor(fillMetalStyle && fillMetalStyle.color)
+            || toText(fillMetalStyle && fillMetalStyle.texture, '')
+        );
+    }
+
+    function buildTintedCanvas(image, textureImage, color) {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.naturalWidth || image.width;
+        canvas.height = image.naturalHeight || image.height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return null;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (textureImage) {
+            const pattern = ctx.createPattern(textureImage, 'repeat');
+            if (pattern) {
+                ctx.fillStyle = pattern;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.drawImage(textureImage, 0, 0, canvas.width, canvas.height);
+            }
+        } else {
+            ctx.drawImage(image, 0, 0);
+            if (color) {
+                ctx.globalCompositeOperation = 'multiply';
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+        }
+
+        ctx.globalCompositeOperation = 'destination-in';
+        ctx.drawImage(image, 0, 0);
+        return canvas;
+    }
+
+    function renderCanvasFillLayer(container, src, fillMetalStyle, altText) {
+        if (!container) return Promise.resolve();
+
+        const targetSrc = String(src || '').trim();
+        const color = isHexColor(fillMetalStyle && fillMetalStyle.color)
+            ? String(fillMetalStyle.color).trim()
+            : '';
+        const textureSrc = toText(fillMetalStyle && fillMetalStyle.texture, '');
+
+        if (!targetSrc) {
+            container.innerHTML = '';
+            return Promise.resolve();
+        }
+
+        const imageLoads = [loadImageForCanvas(targetSrc)];
+        if (textureSrc) {
+            imageLoads.push(loadImageForCanvas(textureSrc).catch(() => null));
+        } else {
+            imageLoads.push(Promise.resolve(null));
+        }
+
+        return Promise.all(imageLoads)
+            .then(([image, textureImage]) => {
+                const canvas = buildTintedCanvas(image, textureImage, color);
+                if (!canvas) throw new Error('Failed to create canvas context.');
+                canvas.className = 'colorizer__rendered-layer';
+                canvas.setAttribute('role', 'img');
+                canvas.setAttribute('aria-label', altText);
+                container.innerHTML = '';
+                container.appendChild(canvas);
+            })
+            .catch(() => {
+                const img = document.createElement('img');
+                img.alt = altText;
+                container.innerHTML = '';
+                container.appendChild(img);
+                return setImageSrcWithLoad(img, targetSrc);
+            });
+    }
+
     function getTintedFillSrc(src, fillMetalStyle) {
         const targetSrc = String(src || '').trim();
         const color = isHexColor(fillMetalStyle && fillMetalStyle.color)
@@ -1223,34 +1335,8 @@
 
         return Promise.all(imageLoads)
             .then(([image, textureImage]) => {
-                const canvas = document.createElement('canvas');
-                canvas.width = image.naturalWidth || image.width;
-                canvas.height = image.naturalHeight || image.height;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) return targetSrc;
-
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-                if (textureImage) {
-                    const pattern = ctx.createPattern(textureImage, 'repeat');
-                    if (pattern) {
-                        ctx.fillStyle = pattern;
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    } else {
-                        ctx.drawImage(textureImage, 0, 0, canvas.width, canvas.height);
-                    }
-                } else {
-                    ctx.drawImage(image, 0, 0);
-                    if (color) {
-                        ctx.globalCompositeOperation = 'multiply';
-                        ctx.fillStyle = color;
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    }
-                }
-
-                ctx.globalCompositeOperation = 'destination-in';
-                ctx.drawImage(image, 0, 0);
-
+                const canvas = buildTintedCanvas(image, textureImage, color);
+                if (!canvas) return targetSrc;
                 const tintedSrc = canvas.toDataURL('image/png');
                 tintedFillCache.set(cacheKey, tintedSrc);
                 return tintedSrc;
@@ -1266,6 +1352,10 @@
         }
 
         const fillMetalStyle = isObject(options && options.fillMetalStyle) ? options.fillMetalStyle : { color: '', texture: '', sourceOverride: '' };
+        if (isFileProtocol() && hasFillMetalStyle(fillMetalStyle)) {
+            return renderCanvasFillLayer(container, src, fillMetalStyle, altText);
+        }
+
         return getTintedFillSrc(src, fillMetalStyle).then((targetSrc) => {
             const img = document.createElement('img');
             img.alt = altText;
@@ -1372,11 +1462,29 @@
     }
 
     async function loadConfig() {
-        const response = await fetch(CONFIG_URL, { cache: 'no-store' });
-        if (!response.ok) {
-            throw new Error('Config HTTP ' + response.status);
+        const fallbackConfig = clonePlainData(window[CONFIG_FALLBACK_KEY]);
+
+        if (!isFileProtocol()) {
+            try {
+                const response = await fetch(CONFIG_URL, { cache: 'no-store' });
+                if (!response.ok) {
+                    throw new Error('Config HTTP ' + response.status);
+                }
+                return response.json();
+            } catch (err) {
+                if (fallbackConfig) {
+                    console.warn('Failed to fetch colorizer config JSON, using embedded fallback instead.', err);
+                    return fallbackConfig;
+                }
+                throw err;
+            }
         }
-        return response.json();
+
+        if (fallbackConfig) {
+            return fallbackConfig;
+        }
+
+        throw new Error('Embedded config fallback is missing for file:// mode.');
     }
 
     function applyConfig(config) {
