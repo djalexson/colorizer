@@ -2,6 +2,7 @@
     const CONFIG_URL = 'colorizer_config.json';
     const CONFIG_FALLBACK_KEY = 'COLORIZER_CONFIG';
     const STORAGE_KEY = 'colorizer_state_v2';
+    const FORCED_VIEW = 'long';
 
     let defaultBackground = '';
     let notices = { noImage: 'Нет изображения для этой комбинации.' };
@@ -34,6 +35,67 @@
     let selectedMetalByBlock = {};
     let selectedFillMetalByType = {};
 
+    const PREVIEW_LAYOUT_SCHEMA = [
+        {
+            tag: 'img',
+            className: 'colorizer__bg',
+            attrs: {
+                id: 'previewBg',
+                src: 'assets/colorizer/backgrounds/ch1.jpg',
+                alt: 'фон'
+            }
+        },
+        {
+            tag: 'div',
+            className: 'colorizer__overlay colorizer__overlay--fill',
+            attrs: { id: 'overlayFill' }
+        },
+        {
+            tag: 'div',
+            className: 'colorizer__overlay colorizer__overlay--front',
+            attrs: { id: 'overlayFront' }
+        },
+        {
+            tag: 'div',
+            className: 'overlay-notice',
+            attrs: { id: 'overlayNotice', hidden: '' }
+        },
+        {
+            tag: 'button',
+            className: 'colorizer__download-btn',
+            attrs: {
+                type: 'button',
+                id: 'downloadPreview',
+                'aria-label': 'Скачать изображение'
+            },
+            children: [
+                {
+                    tag: 'i',
+                    className: 'bi bi-download',
+                    attrs: { 'aria-hidden': 'true' }
+                },
+                {
+                    tag: 'span',
+                    text: 'Скачать'
+                }
+            ]
+        }
+    ];
+    const SETTINGS_SECTION_SCHEMA = [
+        { sectionId: 'viewSection', label: 'Вид', groupId: 'viewGroup' },
+        { sectionId: 'blockSection', label: 'Текстуры', groupId: 'blockGroup' },
+        { sectionId: 'typeSection', label: 'Наполнение', groupId: 'typeGroup' },
+        { sectionId: 'metalSection', label: 'Цвет текстуры', groupId: 'metalGroup' },
+        { sectionId: 'fillMetalSection', label: 'Цвет металла', groupId: 'fillMetalGroup' }
+    ];
+
+    const colorizerRoot = document.querySelector('.colorizer');
+    const previewPane = document.querySelector('.colorizer__preview');
+    const settingsPanel = document.querySelector('.colorizer__settings');
+    const settingsCta = document.getElementById('settingsCta');
+
+    mountStaticLayout();
+
     const bgImg = document.getElementById('previewBg');
     const overlayFill = document.getElementById('overlayFill');
     const overlayFront = document.getElementById('overlayFront');
@@ -58,21 +120,17 @@
     const fillMetalGroup = document.getElementById('fillMetalGroup');
     const viewGroup = document.getElementById('viewGroup');
     const exampleList = document.querySelector('.colorizer__examples');
-    const previewPane = document.querySelector('.colorizer__preview');
-    const colorizerRoot = document.querySelector('.colorizer');
-    const settingsPanel = document.querySelector('.colorizer__settings');
-    const settingsCta = document.getElementById('settingsCta');
 
     const state = {
         block: '',
         type: '',
         metal: '',
         fillMetal: '',
-        view: 'regular'
+        view: FORCED_VIEW
     };
 
     const EMPTY_UPLOAD_LABEL = 'Файл не выбран';
-    const DEFAULT_VIEW_ORDER = ['regular', 'long'];
+    const DEFAULT_VIEW_ORDER = [FORCED_VIEW];
     const DEFAULT_SECTION_ORDER = ['views', 'blocks', 'types', 'textureColors', 'metalColors'];
     const DEFAULT_DOWNLOAD_BUTTON = {
         enabled: true,
@@ -87,6 +145,65 @@
 
     function isObject(value) {
         return !!value && typeof value === 'object' && !Array.isArray(value);
+    }
+
+    function createElementFromSchema(schema) {
+        const element = document.createElement(schema.tag || 'div');
+        if (schema.className) element.className = schema.className;
+        if (schema.text) element.textContent = schema.text;
+
+        const attrs = isObject(schema.attrs) ? schema.attrs : {};
+        Object.keys(attrs).forEach((name) => {
+            const value = attrs[name];
+            if (typeof value === 'boolean') {
+                if (value) element.setAttribute(name, '');
+                return;
+            }
+            element.setAttribute(name, String(value));
+        });
+
+        const children = Array.isArray(schema.children) ? schema.children : [];
+        children.forEach((child) => {
+            element.appendChild(createElementFromSchema(child));
+        });
+
+        return element;
+    }
+
+    function createSettingsSection(section) {
+        return createElementFromSchema({
+            tag: 'div',
+            className: 'fence-group',
+            attrs: { id: section.sectionId },
+            children: [
+                {
+                    tag: 'div',
+                    className: 'fence-group__label',
+                    text: section.label
+                },
+                {
+                    tag: 'div',
+                    className: 'fence-group__options',
+                    attrs: { id: section.groupId }
+                }
+            ]
+        });
+    }
+
+    function mountStaticLayout() {
+        if (previewPane) {
+            previewPane.innerHTML = '';
+            PREVIEW_LAYOUT_SCHEMA.forEach((item) => {
+                previewPane.appendChild(createElementFromSchema(item));
+            });
+        }
+
+        if (settingsPanel) {
+            settingsPanel.innerHTML = '';
+            SETTINGS_SECTION_SCHEMA.forEach((section) => {
+                settingsPanel.appendChild(createSettingsSection(section));
+            });
+        }
     }
 
     function clonePlainData(value) {
@@ -373,29 +490,36 @@
         });
     }
 
+    function applySectionLabel(sectionNode, rawValue, fallback) {
+        if (!sectionNode) return;
+
+        const labelNode = sectionNode.querySelector('.fence-group__label');
+        if (!labelNode) return;
+
+        if (typeof rawValue === 'string') {
+            const text = rawValue.trim();
+            if (!text) {
+                labelNode.textContent = '';
+                labelNode.hidden = true;
+                return;
+            }
+            labelNode.textContent = rawValue;
+            labelNode.hidden = false;
+            return;
+        }
+
+        labelNode.textContent = fallback;
+        labelNode.hidden = false;
+    }
+
     function applySectionLabels() {
         const sectionLabels = isObject(labels.sections) ? labels.sections : {};
 
-        if (viewSection) {
-            const labelNode = viewSection.querySelector('.fence-group__label');
-            if (labelNode) labelNode.textContent = toText(sectionLabels.views, 'Вид');
-        }
-        if (blockSection) {
-            const labelNode = blockSection.querySelector('.fence-group__label');
-            if (labelNode) labelNode.textContent = toText(sectionLabels.blocks, 'Текстуры');
-        }
-        if (typeSection) {
-            const labelNode = typeSection.querySelector('.fence-group__label');
-            if (labelNode) labelNode.textContent = toText(sectionLabels.types, 'Наполнение');
-        }
-        if (metalSection) {
-            const labelNode = metalSection.querySelector('.fence-group__label');
-            if (labelNode) labelNode.textContent = toText(sectionLabels.metals, 'Цвет текстуры');
-        }
-        if (fillMetalSection) {
-            const labelNode = fillMetalSection.querySelector('.fence-group__label');
-            if (labelNode) labelNode.textContent = toText(sectionLabels.fillMetals, 'Цвет металла');
-        }
+        applySectionLabel(viewSection, sectionLabels.views, 'Вид');
+        applySectionLabel(blockSection, sectionLabels.blocks, 'Текстуры');
+        applySectionLabel(typeSection, sectionLabels.types, 'Наполнение');
+        applySectionLabel(metalSection, sectionLabels.metals, 'Цвет текстуры');
+        applySectionLabel(fillMetalSection, sectionLabels.fillMetals, 'Цвет металла');
     }
 
     function applyDownloadButtonConfig() {
@@ -873,6 +997,10 @@
         });
     }
 
+    function isLongViewKey(view) {
+        return /^long(_v\d+)?$/i.test(String(view || ''));
+    }
+
     function getCurrentColorNode() {
         const colors = getCurrentColors();
         return colors[state.metal] || colors[firstKey(colors)] || null;
@@ -888,7 +1016,6 @@
                 if (fillViews.has(view)) views.push(view);
             });
 
-            // If sets do not intersect, fallback to union to keep the UI usable.
             if (!views.length) {
                 const fallback = new Set();
                 fillViews.forEach((view) => fallback.add(view));
@@ -901,7 +1028,7 @@
             views = Array.from(colorViews);
         }
 
-        const candidates = sortViewKeys(views);
+        const candidates = sortViewKeys(views).filter((view) => isLongViewKey(view));
         const initialViews = candidates.length ? candidates : DEFAULT_VIEW_ORDER.slice();
         const uniqueViews = [];
         const seenSignatures = new Set();
@@ -1128,7 +1255,7 @@
 
         const availableViews = getAvailableViews();
         if (availableViews.indexOf(state.view) === -1) {
-            state.view = availableViews.indexOf('regular') !== -1 ? 'regular' : (availableViews[0] || 'regular');
+            state.view = availableViews[0] || FORCED_VIEW;
         }
     }
 
@@ -1557,7 +1684,7 @@
         state.type = String(defaultState.type || '');
         state.metal = String(defaultState.metal || '');
         state.fillMetal = String(defaultState.fillMetal || '');
-        state.view = String(defaultState.view || 'regular');
+        state.view = String(defaultState.view || FORCED_VIEW);
 
         renderExamples((config && config.examples) || []);
     }
@@ -1698,7 +1825,7 @@
         viewGroup.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-view]');
             if (!btn || btn.disabled) return;
-            state.view = btn.getAttribute('data-view') || 'regular';
+            state.view = btn.getAttribute('data-view') || FORCED_VIEW;
             refreshUI();
         });
     }
