@@ -8,11 +8,19 @@
 "block": "gorc_deluxe_1",
 "type": "ranch_horizontal_1",
 "metal": "amber",
-"view": "regular",
+"view": "long",
 "fillMetal": "black"
 },
+"allowedViews": [
+"regular",
+"long",
+"long_v2",
+"long_v3"
+],
+"swatchFallbackColor": "#8d9398",
 "notices": {
-"noImage": "Нет изображения для этой комбинации."
+"noImage": "Нет изображения для этой комбинации.",
+"configLoadFailed": "Не удалось загрузить настройки конструктора."
 }
 },
 "labels": {
@@ -26,7 +34,7 @@
 },
 "withoutTexture": "Без текстур",
 "views": {
-"regular": "Обычный",
+"regular": "",
 "long": "Длинный",
 "long_v2": "Длинный 2",
 "long_v3": "Длинный 3"
@@ -723,10 +731,96 @@
 "types",
 "metalColors"
 ],
+"upload": {
+"emptyLabel": "Файл не выбран",
+"loadedLabel": "Загруженное фото"
+},
 "downloadButton": {
 "enabled": true,
 "label": "Скачать",
 "ariaLabel": "Скачать изображение"
+},
+"layout": {
+"preview": [
+{
+"tag": "img",
+"className": "colorizer__bg",
+"attrs": {
+"id": "previewBg",
+"alt": "фон"
+}
+},
+{
+"tag": "div",
+"className": "colorizer__overlay colorizer__overlay--fill",
+"attrs": {
+"id": "overlayFill"
+}
+},
+{
+"tag": "div",
+"className": "colorizer__overlay colorizer__overlay--front",
+"attrs": {
+"id": "overlayFront"
+}
+},
+{
+"tag": "div",
+"className": "overlay-notice",
+"attrs": {
+"id": "overlayNotice",
+"hidden": true
+}
+},
+{
+"tag": "button",
+"className": "colorizer__download-btn",
+"attrs": {
+"type": "button",
+"id": "downloadPreview"
+},
+"children": [
+{
+"tag": "i",
+"className": "bi bi-download",
+"attrs": {
+"aria-hidden": "true"
+}
+},
+{
+"tag": "span",
+"text": "Скачать"
+}
+]
+}
+],
+"sections": [
+{
+"key": "views",
+"sectionId": "viewSection",
+"groupId": "viewGroup"
+},
+{
+"key": "blocks",
+"sectionId": "blockSection",
+"groupId": "blockGroup"
+},
+{
+"key": "types",
+"sectionId": "typeSection",
+"groupId": "typeGroup"
+},
+{
+"key": "textureColors",
+"sectionId": "metalSection",
+"groupId": "metalGroup"
+},
+{
+"key": "metalColors",
+"sectionId": "fillMetalSection",
+"groupId": "fillMetalGroup"
+}
+]
 }
 }
 }

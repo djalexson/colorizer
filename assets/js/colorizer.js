@@ -2,17 +2,38 @@
     const CONFIG_URL = 'colorizer_config.json';
     const CONFIG_FALLBACK_KEY = 'COLORIZER_CONFIG';
     const STORAGE_KEY = 'colorizer_state_v2';
-    const FORCED_VIEW = 'long';
-
-    let defaultBackground = '';
-    let notices = { noImage: 'Нет изображения для этой комбинации.' };
-    let labels = {
-        withoutTexture: 'Без текстур',
-        views: {
-            regular: 'Вид',
-            long: 'Длинный'
-        }
+    const DEFAULT_FALLBACK_VIEW = 'long';
+    const DEFAULT_UPLOAD_LABEL = 'Файл не выбран';
+    const DEFAULT_UPLOADED_PHOTO_LABEL = 'Загруженное фото';
+    const DEFAULT_SECTION_ORDER = ['views', 'blocks', 'types', 'textureColors', 'metalColors'];
+    const DEFAULT_DOWNLOAD_BUTTON = {
+        enabled: true,
+        label: 'Скачать',
+        ariaLabel: 'Скачать изображение'
     };
+    const DEFAULT_SWATCH_FALLBACK_COLOR = '#8d9398';
+    const DEFAULT_NO_IMAGE_NOTICE = 'Нет изображения для этой комбинации.';
+    const DEFAULT_CONFIG_LOAD_FAILED_NOTICE = 'Не удалось загрузить настройки конструктора.';
+    const DEFAULT_SECTION_LABELS = {
+        views: 'Вид',
+        blocks: 'Текстуры',
+        types: 'Наполнение',
+        metals: 'Цвет текстуры',
+        fillMetals: 'Цвет металла'
+    };
+    const DEFAULT_VIEW_LABELS = {
+        regular: 'Вид',
+        long: 'Длинный'
+    };
+    const BOOT_CONFIG = (function () {
+        const raw = window[CONFIG_FALLBACK_KEY];
+        return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : null;
+    })();
+    const BOOT_SETTINGS = readBootSettings(BOOT_CONFIG);
+
+    let defaultBackground = BOOT_SETTINGS.defaultBackground;
+    let notices = BOOT_SETTINGS.notices;
+    let labels = BOOT_SETTINGS.labels;
     let dynamicData = {
         withoutTextureId: 'without_texture',
         textureOrder: [],
@@ -23,71 +44,17 @@
             withoutTexture: {}
         }
     };
-    let uiSettings = {
-        sectionOrder: ['views', 'blocks', 'types', 'textureColors', 'metalColors'],
-        downloadButton: {
-            enabled: true,
-            label: 'Скачать',
-            ariaLabel: 'Скачать изображение'
-        }
-    };
+    let uiSettings = BOOT_SETTINGS.uiSettings;
+    let allowedViews = BOOT_SETTINGS.allowedViews;
+    let defaultView = BOOT_SETTINGS.defaultView;
+    let emptyUploadLabel = BOOT_SETTINGS.emptyUploadLabel;
+    let uploadedPhotoLabel = BOOT_SETTINGS.uploadedPhotoLabel;
+    let swatchFallbackColor = BOOT_SETTINGS.swatchFallbackColor;
     let blockOrder = [];
     let selectedMetalByBlock = {};
     let selectedFillMetalByType = {};
-
-    const PREVIEW_LAYOUT_SCHEMA = [
-        {
-            tag: 'img',
-            className: 'colorizer__bg',
-            attrs: {
-                id: 'previewBg',
-                src: 'assets/colorizer/backgrounds/ch1.jpg',
-                alt: 'фон'
-            }
-        },
-        {
-            tag: 'div',
-            className: 'colorizer__overlay colorizer__overlay--fill',
-            attrs: { id: 'overlayFill' }
-        },
-        {
-            tag: 'div',
-            className: 'colorizer__overlay colorizer__overlay--front',
-            attrs: { id: 'overlayFront' }
-        },
-        {
-            tag: 'div',
-            className: 'overlay-notice',
-            attrs: { id: 'overlayNotice', hidden: '' }
-        },
-        {
-            tag: 'button',
-            className: 'colorizer__download-btn',
-            attrs: {
-                type: 'button',
-                id: 'downloadPreview',
-                'aria-label': 'Скачать изображение'
-            },
-            children: [
-                {
-                    tag: 'i',
-                    className: 'bi bi-download',
-                    attrs: { 'aria-hidden': 'true' }
-                },
-                {
-                    tag: 'span',
-                    text: 'Скачать'
-                }
-            ]
-        }
-    ];
-    const SETTINGS_SECTION_SCHEMA = [
-        { sectionId: 'viewSection', label: 'Вид', groupId: 'viewGroup' },
-        { sectionId: 'blockSection', label: 'Текстуры', groupId: 'blockGroup' },
-        { sectionId: 'typeSection', label: 'Наполнение', groupId: 'typeGroup' },
-        { sectionId: 'metalSection', label: 'Цвет текстуры', groupId: 'metalGroup' },
-        { sectionId: 'fillMetalSection', label: 'Цвет металла', groupId: 'fillMetalGroup' }
-    ];
+    let previewLayoutSchema = BOOT_SETTINGS.previewLayoutSchema;
+    let settingsSectionSchema = BOOT_SETTINGS.settingsSectionSchema;
 
     const colorizerRoot = document.querySelector('.colorizer');
     const previewPane = document.querySelector('.colorizer__preview');
@@ -126,18 +93,9 @@
         type: '',
         metal: '',
         fillMetal: '',
-        view: FORCED_VIEW
+        view: defaultView
     };
 
-    const EMPTY_UPLOAD_LABEL = 'Файл не выбран';
-    const DEFAULT_VIEW_ORDER = [FORCED_VIEW];
-    const DEFAULT_SECTION_ORDER = ['views', 'blocks', 'types', 'textureColors', 'metalColors'];
-    const DEFAULT_DOWNLOAD_BUTTON = {
-        enabled: true,
-        label: 'Скачать',
-        ariaLabel: 'Скачать изображение'
-    };
-    const SWATCH_FALLBACK_COLOR = '#8d9398';
     let uploadedFileName = '';
     let swatchMap = {};
     let previewLoadRequestId = 0;
@@ -145,6 +103,211 @@
 
     function isObject(value) {
         return !!value && typeof value === 'object' && !Array.isArray(value);
+    }
+
+    function buildDefaultPreviewLayoutSchema(backgroundSrc, downloadButton) {
+        const label = downloadButton && typeof downloadButton.label === 'string' && downloadButton.label.trim()
+            ? downloadButton.label
+            : DEFAULT_DOWNLOAD_BUTTON.label;
+        const ariaLabel = downloadButton && typeof downloadButton.ariaLabel === 'string' && downloadButton.ariaLabel.trim()
+            ? downloadButton.ariaLabel
+            : DEFAULT_DOWNLOAD_BUTTON.ariaLabel;
+        const backgroundAttrs = {
+            id: 'previewBg',
+            alt: 'фон'
+        };
+
+        if (backgroundSrc) {
+            backgroundAttrs.src = backgroundSrc;
+        }
+
+        return [
+            {
+                tag: 'img',
+                className: 'colorizer__bg',
+                attrs: backgroundAttrs
+            },
+            {
+                tag: 'div',
+                className: 'colorizer__overlay colorizer__overlay--fill',
+                attrs: { id: 'overlayFill' }
+            },
+            {
+                tag: 'div',
+                className: 'colorizer__overlay colorizer__overlay--front',
+                attrs: { id: 'overlayFront' }
+            },
+            {
+                tag: 'div',
+                className: 'overlay-notice',
+                attrs: { id: 'overlayNotice', hidden: '' }
+            },
+            {
+                tag: 'button',
+                className: 'colorizer__download-btn',
+                attrs: {
+                    type: 'button',
+                    id: 'downloadPreview',
+                    'aria-label': ariaLabel
+                },
+                children: [
+                    {
+                        tag: 'i',
+                        className: 'bi bi-download',
+                        attrs: { 'aria-hidden': 'true' }
+                    },
+                    {
+                        tag: 'span',
+                        text: label
+                    }
+                ]
+            }
+        ];
+    }
+
+    function sectionLabelByKey(key, sectionLabels) {
+        const labelsMap = isObject(sectionLabels) ? sectionLabels : DEFAULT_SECTION_LABELS;
+        const normalizedKey = String(key || '').trim();
+        if (normalizedKey === 'views') return labelsMap.views;
+        if (normalizedKey === 'blocks') return labelsMap.blocks;
+        if (normalizedKey === 'types') return labelsMap.types;
+        if (normalizedKey === 'textureColors') return labelsMap.metals;
+        if (normalizedKey === 'metalColors') return labelsMap.fillMetals;
+        return '';
+    }
+
+    function buildDefaultSettingsSectionSchema(sectionLabels) {
+        return [
+            { key: 'views', sectionId: 'viewSection', groupId: 'viewGroup', label: sectionLabelByKey('views', sectionLabels) },
+            { key: 'blocks', sectionId: 'blockSection', groupId: 'blockGroup', label: sectionLabelByKey('blocks', sectionLabels) },
+            { key: 'types', sectionId: 'typeSection', groupId: 'typeGroup', label: sectionLabelByKey('types', sectionLabels) },
+            { key: 'textureColors', sectionId: 'metalSection', groupId: 'metalGroup', label: sectionLabelByKey('textureColors', sectionLabels) },
+            { key: 'metalColors', sectionId: 'fillMetalSection', groupId: 'fillMetalGroup', label: sectionLabelByKey('metalColors', sectionLabels) }
+        ];
+    }
+
+    function normalizeAllowedViews(rawValue) {
+        if (!Array.isArray(rawValue)) return [DEFAULT_FALLBACK_VIEW];
+
+        const uniqueViews = [];
+        const seen = new Set();
+        rawValue.forEach((item) => {
+            const value = String(item || '').trim();
+            if (!value || seen.has(value)) return;
+            if (!(value === 'regular' || value === 'long' || /^long_v\d+$/i.test(value))) return;
+            seen.add(value);
+            uniqueViews.push(value);
+        });
+
+        return uniqueViews.length ? uniqueViews : [DEFAULT_FALLBACK_VIEW];
+    }
+
+    function normalizePreviewLayoutSchema(rawValue, backgroundSrc, downloadButton) {
+        const fallback = buildDefaultPreviewLayoutSchema(backgroundSrc, downloadButton);
+        if (!Array.isArray(rawValue) || !rawValue.length) return clonePlainData(fallback);
+
+        const schema = clonePlainData(rawValue);
+        schema.forEach((node) => {
+            if (!isObject(node)) return;
+            if (!isObject(node.attrs)) node.attrs = {};
+
+            if (node.attrs.id === 'previewBg' && backgroundSrc && !String(node.attrs.src || '').trim()) {
+                node.attrs.src = backgroundSrc;
+            }
+
+            if (node.attrs.id === 'downloadPreview' && !String(node.attrs['aria-label'] || '').trim()) {
+                node.attrs['aria-label'] = downloadButton.ariaLabel || DEFAULT_DOWNLOAD_BUTTON.ariaLabel;
+            }
+        });
+
+        return schema;
+    }
+
+    function normalizeSettingsSectionSchema(rawValue, sectionLabels) {
+        const fallback = buildDefaultSettingsSectionSchema(sectionLabels);
+        if (!Array.isArray(rawValue) || !rawValue.length) return clonePlainData(fallback);
+
+        const normalized = rawValue.map((item, index) => {
+            if (!isObject(item)) return null;
+
+            const fallbackItem = fallback[index] || fallback[0];
+            const key = String(item.key || fallbackItem.key || '').trim();
+            const sectionId = String(item.sectionId || fallbackItem.sectionId || '').trim();
+            const groupId = String(item.groupId || fallbackItem.groupId || '').trim();
+            if (!key || !sectionId || !groupId) return null;
+
+            return {
+                key: key,
+                sectionId: sectionId,
+                groupId: groupId,
+                label: typeof item.label === 'string' ? item.label : sectionLabelByKey(key, sectionLabels),
+                className: typeof item.className === 'string' && item.className.trim() ? item.className : 'fence-group',
+                labelClassName: typeof item.labelClassName === 'string' && item.labelClassName.trim() ? item.labelClassName : 'fence-group__label',
+                groupClassName: typeof item.groupClassName === 'string' && item.groupClassName.trim() ? item.groupClassName : 'fence-group__options'
+            };
+        }).filter(Boolean);
+
+        return normalized.length ? normalized : clonePlainData(fallback);
+    }
+
+    function readBootSettings(config) {
+        const source = isObject(config) ? config : {};
+        const assets = isObject(source.assets) ? source.assets : {};
+        const behavior = isObject(source.behavior) ? source.behavior : {};
+        const labelsConfig = isObject(source.labels) ? source.labels : {};
+        const ui = isObject(source.ui) ? source.ui : {};
+        const layout = isObject(ui.layout) ? ui.layout : {};
+        const upload = isObject(ui.upload) ? ui.upload : {};
+        const downloadButton = isObject(ui.downloadButton) ? ui.downloadButton : {};
+        const defaultState = isObject(behavior.defaultState) ? behavior.defaultState : {};
+        const sectionLabels = Object.assign({}, DEFAULT_SECTION_LABELS, isObject(labelsConfig.sections) ? labelsConfig.sections : {});
+        const viewLabels = Object.assign({}, DEFAULT_VIEW_LABELS, isObject(labelsConfig.views) ? labelsConfig.views : {});
+        const allowed = normalizeAllowedViews(behavior.allowedViews);
+        const requestedView = String(defaultState.view || '').trim();
+        const resolvedDownloadButton = {
+            enabled: typeof downloadButton.enabled === 'boolean' ? downloadButton.enabled : DEFAULT_DOWNLOAD_BUTTON.enabled,
+            label: typeof downloadButton.label === 'string' && downloadButton.label.trim() ? downloadButton.label : DEFAULT_DOWNLOAD_BUTTON.label,
+            ariaLabel: typeof downloadButton.ariaLabel === 'string' && downloadButton.ariaLabel.trim() ? downloadButton.ariaLabel : DEFAULT_DOWNLOAD_BUTTON.ariaLabel
+        };
+        const resolvedDefaultBackground = typeof assets.defaultBackground === 'string' && assets.defaultBackground.trim()
+            ? assets.defaultBackground.trim()
+            : '';
+        const resolvedDefaultView = requestedView && allowed.indexOf(requestedView) !== -1
+            ? requestedView
+            : (allowed[0] || DEFAULT_FALLBACK_VIEW);
+
+        return {
+            defaultBackground: resolvedDefaultBackground,
+            notices: Object.assign({
+                noImage: DEFAULT_NO_IMAGE_NOTICE,
+                configLoadFailed: DEFAULT_CONFIG_LOAD_FAILED_NOTICE
+            }, isObject(behavior.notices) ? behavior.notices : {}),
+            labels: Object.assign({
+                withoutTexture: 'Без текстур'
+            }, labelsConfig, {
+                sections: sectionLabels,
+                views: viewLabels
+            }),
+            uiSettings: {
+                sectionOrder: Array.isArray(ui.sectionOrder) && ui.sectionOrder.length ? ui.sectionOrder.slice() : DEFAULT_SECTION_ORDER.slice(),
+                downloadButton: resolvedDownloadButton
+            },
+            allowedViews: allowed,
+            defaultView: resolvedDefaultView,
+            emptyUploadLabel: typeof upload.emptyLabel === 'string' && upload.emptyLabel.trim() ? upload.emptyLabel : DEFAULT_UPLOAD_LABEL,
+            uploadedPhotoLabel: typeof upload.loadedLabel === 'string' && upload.loadedLabel.trim() ? upload.loadedLabel : DEFAULT_UPLOADED_PHOTO_LABEL,
+            swatchFallbackColor: isHexColor(behavior.swatchFallbackColor) ? behavior.swatchFallbackColor : DEFAULT_SWATCH_FALLBACK_COLOR,
+            previewLayoutSchema: normalizePreviewLayoutSchema(layout.preview, resolvedDefaultBackground, resolvedDownloadButton),
+            settingsSectionSchema: normalizeSettingsSectionSchema(layout.sections, sectionLabels)
+        };
+    }
+
+    function getFallbackView() {
+        return String(defaultView || allowedViews[0] || DEFAULT_FALLBACK_VIEW);
+    }
+
+    function getDefaultViewOrder() {
+        return Array.isArray(allowedViews) && allowedViews.length ? allowedViews.slice() : [getFallbackView()];
     }
 
     function createElementFromSchema(schema) {
@@ -173,17 +336,17 @@
     function createSettingsSection(section) {
         return createElementFromSchema({
             tag: 'div',
-            className: 'fence-group',
+            className: section.className || 'fence-group',
             attrs: { id: section.sectionId },
             children: [
                 {
                     tag: 'div',
-                    className: 'fence-group__label',
+                    className: section.labelClassName || 'fence-group__label',
                     text: section.label
                 },
                 {
                     tag: 'div',
-                    className: 'fence-group__options',
+                    className: section.groupClassName || 'fence-group__options',
                     attrs: { id: section.groupId }
                 }
             ]
@@ -193,14 +356,14 @@
     function mountStaticLayout() {
         if (previewPane) {
             previewPane.innerHTML = '';
-            PREVIEW_LAYOUT_SCHEMA.forEach((item) => {
+            previewLayoutSchema.forEach((item) => {
                 previewPane.appendChild(createElementFromSchema(item));
             });
         }
 
         if (settingsPanel) {
             settingsPanel.innerHTML = '';
-            SETTINGS_SECTION_SCHEMA.forEach((section) => {
+            settingsSectionSchema.forEach((section) => {
                 settingsPanel.appendChild(createSettingsSection(section));
             });
         }
@@ -306,7 +469,7 @@
         const baseKey = match ? match[1] : key;
         const index = match && match[2] ? parseInt(match[2], 10) : 0;
 
-        const base = swatchMap[baseKey] || SWATCH_FALLBACK_COLOR;
+        const base = swatchMap[baseKey] || swatchFallbackColor;
         if (!index) return base;
 
         const shifts = [0, 14, -14, 22, -22, 30, -30];
@@ -554,7 +717,7 @@
             viewQueue.push(key);
         };
 
-        const selectedView = String(requestedView || state.view || 'regular');
+        const selectedView = String(requestedView || state.view || getFallbackView());
         pushView(selectedView);
         if (/^long(_v\d+)?$/i.test(selectedView)) {
             pushView('long');
@@ -590,7 +753,7 @@
                 type: state.type || '',
                 metal: state.metal || '',
                 fillMetal: state.fillMetal || '',
-                view: state.view || 'regular',
+                view: state.view || getFallbackView(),
                 selectedMetalByBlock: selectedMetalByBlock,
                 selectedFillMetalByType: selectedFillMetalByType,
                 bgSrc: (bgImg && bgImg.src) ? String(bgImg.src) : '',
@@ -624,7 +787,7 @@
 
     function setUploadName(text) {
         if (!uploadName) return;
-        uploadName.textContent = text || EMPTY_UPLOAD_LABEL;
+        uploadName.textContent = text || emptyUploadLabel;
     }
 
     function setUploadThumbnail(src, visible) {
@@ -1028,8 +1191,8 @@
             views = Array.from(colorViews);
         }
 
-        const candidates = sortViewKeys(views).filter((view) => isLongViewKey(view));
-        const initialViews = candidates.length ? candidates : DEFAULT_VIEW_ORDER.slice();
+        const candidates = sortViewKeys(views).filter((view) => allowedViews.indexOf(view) !== -1);
+        const initialViews = candidates.length ? candidates : getDefaultViewOrder();
         const uniqueViews = [];
         const seenSignatures = new Set();
 
@@ -1157,8 +1320,21 @@
         return toText(views[view], titleFromKey(view));
     }
 
+    function getConfiguredViewLabel(view) {
+        const views = isObject(labels.views) ? labels.views : {};
+        if (typeof views[view] === 'string') {
+            const text = views[view].trim();
+            return text ? views[view] : '';
+        }
+        return titleFromKey(view);
+    }
+
+    function getVisibleViews() {
+        return getAvailableViews().filter((view) => !!getConfiguredViewLabel(view));
+    }
+
     function resolveTextureSrc(requestedView) {
-        const selectedView = String(requestedView || state.view || 'regular');
+        const selectedView = String(requestedView || state.view || getFallbackView());
         const texture = getCurrentTexture();
         if (!texture) return '';
 
@@ -1254,8 +1430,10 @@
         }
 
         const availableViews = getAvailableViews();
-        if (availableViews.indexOf(state.view) === -1) {
-            state.view = availableViews[0] || FORCED_VIEW;
+        const visibleViews = getVisibleViews();
+        const preferredViews = visibleViews.length ? visibleViews : availableViews;
+        if (preferredViews.indexOf(state.view) === -1) {
+            state.view = preferredViews[0] || getFallbackView();
         }
     }
 
@@ -1328,8 +1506,8 @@
 
         if (viewGroup) {
             viewGroup.innerHTML = '';
-            getAvailableViews().forEach((view) => {
-                viewGroup.appendChild(createButton(viewLabel(view), { 'data-view': view }));
+            getVisibleViews().forEach((view) => {
+                viewGroup.appendChild(createButton(getConfiguredViewLabel(view), { 'data-view': view }));
             });
         }
     }
@@ -1502,7 +1680,8 @@
         const hasFillMetals = getKeys(fillMetals).length > 0;
 
         const availableViews = getAvailableViews();
-        if (viewSection) viewSection.hidden = !isSectionEnabled('views') || availableViews.length <= 1;
+        const visibleViews = getVisibleViews();
+        if (viewSection) viewSection.hidden = !isSectionEnabled('views') || visibleViews.length <= 1;
         if (blockSection) blockSection.hidden = !isSectionEnabled('blocks') || !hasBlocks;
         if (typeSection) typeSection.hidden = !isSectionEnabled('types') || !hasFills;
         if (metalSection) metalSection.hidden = !isSectionEnabled('textureColors') || !hasColors;
@@ -1546,7 +1725,7 @@
         if (viewGroup) {
             viewGroup.querySelectorAll('[data-view]').forEach((btn) => {
                 const view = btn.getAttribute('data-view') || '';
-                const ok = availableViews.indexOf(view) !== -1;
+                const ok = visibleViews.indexOf(view) !== -1;
                 setDisabled(btn, !ok);
                 setActive(btn, ok && view === state.view);
             });
@@ -1589,7 +1768,7 @@
     }
 
     async function loadConfig() {
-        const fallbackConfig = clonePlainData(window[CONFIG_FALLBACK_KEY]);
+        const fallbackConfig = clonePlainData(BOOT_CONFIG);
 
         if (!isFileProtocol()) {
             try {
@@ -1615,38 +1794,21 @@
     }
 
     function applyConfig(config) {
-        const assets = isObject(config && config.assets) ? config.assets : {};
         const behavior = isObject(config && config.behavior) ? config.behavior : {};
+        const resolvedSettings = readBootSettings(config);
         swatchMap = buildSwatchMap(config && config.swatches);
 
-        defaultBackground = String(assets.defaultBackground || (bgImg ? bgImg.src : ''));
+        defaultBackground = String(resolvedSettings.defaultBackground || defaultBackground || (bgImg ? (bgImg.getAttribute('src') || '') : ''));
         if (bgImg && defaultBackground) bgImg.src = defaultBackground;
 
-        notices = Object.assign({ noImage: 'Нет изображения для этой комбинации.' }, behavior.notices || {});
-
-        if (isObject(config && config.labels)) {
-            labels = Object.assign({}, labels, config.labels);
-            labels.sections = Object.assign({}, labels.sections || {});
-            labels.views = Object.assign({ regular: 'Вид', long: 'Длинный' }, labels.views || {});
-        }
-
-        if (isObject(config && config.ui)) {
-            const order = Array.isArray(config.ui.sectionOrder) ? config.ui.sectionOrder : [];
-            const downloadButton = isObject(config.ui.downloadButton) ? config.ui.downloadButton : {};
-            uiSettings = {
-                sectionOrder: order.length ? order.slice() : DEFAULT_SECTION_ORDER.slice(),
-                downloadButton: {
-                    enabled: typeof downloadButton.enabled === 'boolean' ? downloadButton.enabled : DEFAULT_DOWNLOAD_BUTTON.enabled,
-                    label: toText(downloadButton.label, DEFAULT_DOWNLOAD_BUTTON.label),
-                    ariaLabel: toText(downloadButton.ariaLabel, DEFAULT_DOWNLOAD_BUTTON.ariaLabel)
-                }
-            };
-        } else {
-            uiSettings = {
-                sectionOrder: DEFAULT_SECTION_ORDER.slice(),
-                downloadButton: Object.assign({}, DEFAULT_DOWNLOAD_BUTTON)
-            };
-        }
+        notices = resolvedSettings.notices;
+        labels = resolvedSettings.labels;
+        uiSettings = resolvedSettings.uiSettings;
+        allowedViews = resolvedSettings.allowedViews;
+        defaultView = resolvedSettings.defaultView;
+        emptyUploadLabel = resolvedSettings.emptyUploadLabel;
+        uploadedPhotoLabel = resolvedSettings.uploadedPhotoLabel;
+        swatchFallbackColor = resolvedSettings.swatchFallbackColor;
 
         if (isObject(config && config.dynamic)) {
             const texturesData = normalizeTextures(config.dynamic.textures);
@@ -1684,7 +1846,7 @@
         state.type = String(defaultState.type || '');
         state.metal = String(defaultState.metal || '');
         state.fillMetal = String(defaultState.fillMetal || '');
-        state.view = String(defaultState.view || FORCED_VIEW);
+        state.view = String(defaultState.view || getFallbackView());
 
         renderExamples((config && config.examples) || []);
     }
@@ -1699,7 +1861,7 @@
             setBackgroundSrc(src, true);
             setActiveExampleBySrc(src);
             uploadedFileName = '';
-            setUploadName(EMPTY_UPLOAD_LABEL);
+            setUploadName(emptyUploadLabel);
             setUploadThumbnail('', false);
             saveStoredState();
         });
@@ -1712,7 +1874,7 @@
             if (!bgImg) return;
             setBackgroundSrc(String(ev.target.result || ''), true);
             setActiveExampleBySrc('');
-            uploadedFileName = file.name || 'Загруженное фото';
+            uploadedFileName = file.name || uploadedPhotoLabel;
             setUploadName(uploadedFileName);
             setUploadThumbnail(bgImg.src, true);
             saveStoredState();
@@ -1825,7 +1987,7 @@
         viewGroup.addEventListener('click', (e) => {
             const btn = e.target.closest('[data-view]');
             if (!btn || btn.disabled) return;
-            state.view = btn.getAttribute('data-view') || FORCED_VIEW;
+            state.view = btn.getAttribute('data-view') || getFallbackView();
             refreshUI();
         });
     }
@@ -1836,7 +1998,7 @@
             if (bgImg) setBackgroundSrc(defaultBackground || bgImg.src, true);
             setActiveExampleBySrc(bgImg ? bgImg.src : '');
             uploadedFileName = '';
-            setUploadName(EMPTY_UPLOAD_LABEL);
+            setUploadName(emptyUploadLabel);
             setUploadThumbnail('', false);
             saveStoredState();
         });
@@ -1884,17 +2046,17 @@
             const isCustomBg = !!currentBgNorm && !isExampleBg && !isDefaultBg;
 
             if (isCustomBg) {
-                setUploadName(uploadedFileName || 'Загруженное фото');
+                setUploadName(uploadedFileName || uploadedPhotoLabel);
                 setUploadThumbnail(currentBg, true);
             } else {
                 uploadedFileName = '';
-                setUploadName(EMPTY_UPLOAD_LABEL);
+                setUploadName(emptyUploadLabel);
                 setUploadThumbnail('', false);
                 saveStoredState();
             }
         } catch (err) {
             console.error('Failed to load colorizer config:', err);
-            setNotice('Не удалось загрузить настройки конструктора.');
+            setNotice(notices.configLoadFailed || DEFAULT_CONFIG_LOAD_FAILED_NOTICE);
         } finally {
             setBootState(false);
         }
